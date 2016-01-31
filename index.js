@@ -10,6 +10,8 @@ var pagination  = require('metalsmith-pagination');
 var watch       = require('metalsmith-watch');
 var ignore      = require('metalsmith-ignore');
 var excerpts    = require('metalsmith-excerpts');
+var sass        = require('metalsmith-sass');
+var feed        = require('metalsmith-feed');
 
 var fs          = require('fs');
 var Handlebars  = require('handlebars');
@@ -31,6 +33,13 @@ function categoryset(opts) {
 }
 
 Metalsmith(__dirname)
+    .metadata({
+        site: {
+            title:  'Take the Stairs',
+            url:    'http://takestairs.net',
+            author: 'Stephen Sherratt'
+        }
+    })
     .use(ignore([
         '.*.swp',
         '*/.*.swp'
@@ -38,10 +47,16 @@ Metalsmith(__dirname)
     .use(markdown())
     .use(categoryset())
     .use(excerpts())
+    .use(sass({
+        outputStyle: 'expanded'
+    }))
     .use(collections({
         posts: {
             pattern: 'posts/*.html'
         }
+    }))
+    .use(feed({
+        collection: 'posts'
     }))
     .use(permalinks({
         pattern: ':permalink'
