@@ -1,5 +1,5 @@
 ---
 title: Posts
-layout: page.hbt
+layout: posts.hbt
 permalink: posts
 ---
