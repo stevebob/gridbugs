@@ -1,0 +1,5 @@
+{{> header }}
+    <div id="post-wrapper">
+        {{{ contents }}}
+    </div>
+{{> footer }}
