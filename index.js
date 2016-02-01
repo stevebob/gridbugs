@@ -22,6 +22,21 @@ Handlebars.registerPartial('header', fs.readFileSync(__dirname + '/layouts/parti
 Handlebars.registerPartial('footer', fs.readFileSync(__dirname + '/layouts/partials/footer.hbt').toString());
 Handlebars.registerPartial('rightbar', fs.readFileSync(__dirname + '/layouts/partials/rightbar.hbt').toString());
 
+Handlebars.registerHelper("getPages", (pagination) => {
+    var ret = [];
+    var pages = pagination.getPages(10);
+    var current = parseInt(pagination.name);
+    for (var i in pages) {
+        var num = parseInt(i) + 1;
+        if (num == current) {
+            ret.push('<a class="current-page-link" href="/'+pages[i].path+'">' + (parseInt(i)+1) + '</a>');
+        } else {
+            ret.push('<a class="page-link" href="/'+pages[i].path+'">' + (parseInt(i)+1) + '</a>');
+        }
+    }
+    return ret.join('');
+});
+
 function categoryset(opts) {
     return function(files, metalsmith, done) {
         for (var f in files) {
@@ -73,7 +88,7 @@ Metalsmith(__dirname)
     }))
     .use(pagination({
         'collections.posts': {
-            perPage: 10,
+            perPage: 2,
             layout: 'pagination.hbt',
             first: 'index.html',
             path: ':num/index.html',

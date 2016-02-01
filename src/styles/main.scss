@@ -586,3 +586,30 @@ img {
     font-size: 12pt;
     margin-bottom: 12px;
 }
+
+.page-number-container {
+    overflow: hidden;
+    padding-top: 60px;
+    padding-bottom: 60px;
+}
+
+.page-number-outer {
+    position: relative;
+    left: 50%;
+    float: left;
+}
+
+.page-number-inner {
+    position: relative;
+    left: -50%;
+    float: left;
+}
+
+.page-link {
+    padding: 5px;
+}
+
+.current-page-link {
+    padding: 5px;
+    font-weight: bold;
+}
