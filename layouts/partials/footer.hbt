@@ -1,3 +1,11 @@
+            </div>
+            <div id="right-bar">
+                {{> rightbar }}
+            </div>
+        </div>
+        <footer class="site-footer">
+            Powered by METALSMITH
+        </footer>
     </div>
 </body>
 </html>

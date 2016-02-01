@@ -1,0 +1,7 @@
+<ul class="sidebar-list">
+    {{#each collections.posts }}
+    <li>
+        <a class="sidebar-link" href="/{{ this.permalink }}">{{ this.title }}</a>
+    </li>
+    {{/each}}
+</ul>

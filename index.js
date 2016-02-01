@@ -16,10 +16,11 @@ var feed        = require('metalsmith-feed');
 var fs          = require('fs');
 var Handlebars  = require('handlebars');
 
-const DEBUG = true;
+const DEBUG = false;
 
 Handlebars.registerPartial('header', fs.readFileSync(__dirname + '/layouts/partials/header.hbt').toString());
 Handlebars.registerPartial('footer', fs.readFileSync(__dirname + '/layouts/partials/footer.hbt').toString());
+Handlebars.registerPartial('rightbar', fs.readFileSync(__dirname + '/layouts/partials/rightbar.hbt').toString());
 
 function categoryset(opts) {
     return function(files, metalsmith, done) {
@@ -52,9 +53,18 @@ Metalsmith(__dirname)
     }))
     .use(collections({
         posts: {
-            pattern: 'posts/*.html'
+            pattern: 'posts/*.html',
+            sortBy: 'date',
+            reverse: true
         }
     }))
+    .use(function(files, metalsmith, done) {
+        for (var post of metalsmith._metadata.collections.posts) {
+            post.headerTitle = 'Posts';
+            post.headerLink = '/posts';
+        }
+        done();
+    })
     .use(feed({
         collection: 'posts'
     }))
@@ -63,36 +73,51 @@ Metalsmith(__dirname)
     }))
     .use(pagination({
         'collections.posts': {
-            perPage: 2,
-            layout: 'home.hbt',
+            perPage: 10,
+            layout: 'pagination.hbt',
             first: 'index.html',
-            path: ':num/index.html'
+            path: ':num/index.html',
+            pageMetadata: {
+                title: 'Take the Stairs',
+            }
         }
     }))
     .use(pagination({
         'collections.posts': {
             perPage: 2,
-            layout: 'posts.hbt',
+            layout: 'pagination.hbt',
             first: 'posts/index.html',
-            path: 'posts/:num/index.html'
+            path: 'posts/:num/index.html',
+            pageMetadata: {
+                title: 'Posts',
+                headerTitle: 'Posts',
+                headerLink: '/posts'
+            }
         }
     }))
      .use(pagination({
         'collections.posts': {
             perPage: 2,
-            layout: 'projects.hbt',
+            layout: 'pagination.hbt',
             first: 'projects/index.html',
             path: 'projects/:num/index.html',
             filter: (page) => {
                 return page.categories && page.categories.has('project');
+            },
+            pageMetadata: {
+                title: 'Projects',
+                headerTitle: 'Projects',
+                headerLink: '/projects'
             }
         }
     }))
     .use(function(files, metalsmith, done) {
         if (DEBUG) {
-            console.log(files);
-            done();
+            for (var f in files) {
+                console.log(files[f]);
+            }
         }
+        done();
     })
     .use(layouts('handlebars'))
     .build((err) => { if (err) { throw  err; } });

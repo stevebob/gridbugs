@@ -1,6 +1,8 @@
 ---
 layout: page.hbt
 title: About
+headerTitle: About
+headerLink: '/about'
 permalink: about
 ---
 

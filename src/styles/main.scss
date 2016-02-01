@@ -21,7 +21,9 @@ $content-width:    1000px;
 $on-palm:          600px;
 $on-laptop:        800px;
 
-$right-bar-width: 240px;
+$right-bar-width: 256px;
+
+$header-height: 56px;
 
 
 // Using media queries with like this:
@@ -38,6 +40,19 @@ $right-bar-width: 240px;
 }
 
 
+.main-wrapper {
+    min-height: 100%;
+    position: relative;
+}
+
+
+html,
+body {
+    margin:0;
+    padding:0;
+    height:100%;
+}
+
 html {
     overflow-y: scroll;
 }
@@ -45,7 +60,7 @@ html {
 /**
  * Reset some basic elements
  */
-body, h1, h2, h3, h4, h5, h6,
+h1, h2, h3, h4, h5, h6,
 p, blockquote, pre, hr,
 dl, dd, ol, ul, figure {
     margin: 0;
@@ -216,7 +231,9 @@ pre {
 }
 
 .content-wrapper {
-    @media (min-width: 600px) {
+    margin:15px;
+    padding-bottom:60px;
+    @media (min-width: $on-palm) {
         margin-right: $right-bar-width;
         padding-right: $spacing-unit;
         border-right: 2px solid #e8e8e8;
@@ -260,7 +277,7 @@ pre {
  * Site header
  */
 .site-header {
-    min-height: 56px;
+    min-height: $header-height;
     position: relative;
     border-bottom: 2px solid $grey-color-light;
 }
@@ -345,7 +362,12 @@ pre {
  * Site footer
  */
 .site-footer {
-    padding: $spacing-unit 0;
+    height: 60px;
+    position: absolute;
+    bottom: 0px;
+    text-align: center;
+    width: 100%;
+    color: $grey-color;
 }
 
 .footer-heading {
