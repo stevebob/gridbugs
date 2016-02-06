@@ -7,4 +7,4 @@ permalink: bugcatcher
 ---
 
 bugcatcher
-a
+aaoeu

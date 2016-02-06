@@ -13,17 +13,5 @@
         </li>
     {{/each}}
     </ul>
-    <div class="page-number-container">
-        <div class="page-number-outer">
-            <div class="page-number-inner">
-                {{#if pagination.previous }}
-                <a class="page-link" href="/{{ pagination.previous.path }}">prev</a>
-                {{/if}}
-                {{{getPages pagination}}}
-                {{#if pagination.next }}
-                <a class="page-link" href="/{{ pagination.next.path }}">next</a>
-                {{/if}}
-            </div>
-        </div>
-    </div>
+    {{> pagenumbers }}
 {{> footer }}

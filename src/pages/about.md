@@ -6,10 +6,22 @@ headerLink: '/about'
 permalink: about
 ---
 
-I'm Stephen Sherratt and I'm a hobby game developer. I'm particularly interested in
+## Who are you?
+
+I'm Stephen Sherratt. I write games as a hobby. I'm particularly interested in
 roguelikes and roleplaying games. On this site I will post about game design
 ideas and programming techniques.
+
+
+## How do I contact you?
 
 **Email:** [steve@takestairs.net](mailto:steve@takestairs.net)
 
 **Github:** [github.com/stevebob](https://github.com/stevebob)
+
+
+## Hey that's a pretty cool blog! I want one like it!
+
+This blog is made with [MetalSmith](http://www.metalsmith.io) - a static site generator.
+
+The code that generates this blog is here: [github.com/stevebob/takestairs](https://github.com/stevebob/takestairs)

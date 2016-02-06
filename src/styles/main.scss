@@ -21,9 +21,11 @@ $content-width:    1000px;
 $on-palm:          600px;
 $on-laptop:        800px;
 
-$right-bar-width: 256px;
+$right-bar-width: 200px;
 
 $header-height: 56px;
+
+@import 'highlight';
 
 
 // Using media queries with like this:
@@ -231,7 +233,7 @@ pre {
 }
 
 .content-wrapper {
-    margin:15px;
+    margin-top:15px;
     padding-bottom:60px;
     @media (min-width: $on-palm) {
         margin-right: $right-bar-width;
@@ -587,29 +589,42 @@ img {
     margin-bottom: 12px;
 }
 
-.page-number-container {
+.pagination-container {
     overflow: hidden;
     padding-top: 60px;
-    padding-bottom: 60px;
 }
 
-.page-number-outer {
+.pagination-outer {
     position: relative;
     left: 50%;
     float: left;
 }
 
-.page-number-inner {
+.pagination-inner {
     position: relative;
     left: -50%;
     float: left;
+    font-family: titlefont;
+    font-size: 16pt;
 }
 
-.page-link {
+.pagination-link {
     padding: 5px;
 }
 
-.current-page-link {
+.pagination-relative-link {
+}
+
+.current-pagination-link {
     padding: 5px;
     font-weight: bold;
+}
+
+h2 {
+    padding-top: 20px;
+}
+
+.footer-spacer {
+    position: relative;
+    height: 60px;
 }

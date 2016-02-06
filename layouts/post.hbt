@@ -1,5 +1,13 @@
 {{> header }}
-    <div id="post-wrapper">
+<div class="post">
+
+    <header class="post-header">
+        <span class="post-meta">{{{ date }}}</span>
+        <h2>{{{ title }}}</h2>
+    </header>
+
+    <article class="post-content">
         {{{ contents }}}
-    </div>
+    </article>
+</div>
 {{> footer }}

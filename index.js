@@ -1,10 +1,9 @@
 var Metalsmith  = require('metalsmith');
-var markdown    = require('metalsmith-markdown');
+var markdown    = require('metalsmith-markdown-remarkable');
 var layouts     = require('metalsmith-layouts');
 var collections = require('metalsmith-collections');
 var permalinks  = require('metalsmith-permalinks');
 var tags        = require('metalsmith-tags');
-var gist        = require('metalsmith-gist');
 var drafts      = require('metalsmith-drafts');
 var pagination  = require('metalsmith-pagination');
 var watch       = require('metalsmith-watch');
@@ -12,15 +11,18 @@ var ignore      = require('metalsmith-ignore');
 var excerpts    = require('metalsmith-excerpts');
 var sass        = require('metalsmith-sass');
 var feed        = require('metalsmith-feed');
+var serve       = require('metalsmith-serve');
 
 var fs          = require('fs');
 var Handlebars  = require('handlebars');
+var hljs        = require('highlight.js');
 
-const DEBUG = false;
+const DEBUG = true;
 
 Handlebars.registerPartial('header', fs.readFileSync(__dirname + '/layouts/partials/header.hbt').toString());
 Handlebars.registerPartial('footer', fs.readFileSync(__dirname + '/layouts/partials/footer.hbt').toString());
 Handlebars.registerPartial('rightbar', fs.readFileSync(__dirname + '/layouts/partials/rightbar.hbt').toString());
+Handlebars.registerPartial('pagenumbers', fs.readFileSync(__dirname + '/layouts/partials/pagenumbers.hbt').toString());
 
 Handlebars.registerHelper("getPages", (pagination) => {
     var ret = [];
@@ -29,20 +31,53 @@ Handlebars.registerHelper("getPages", (pagination) => {
     for (var i in pages) {
         var num = parseInt(i) + 1;
         if (num == current) {
-            ret.push('<a class="current-page-link" href="/'+pages[i].path+'">' + (parseInt(i)+1) + '</a>');
+            ret.push('<a class="current-pagination-link" href="/'+pages[i].path+'">' + (parseInt(i)+1) + '</a>');
         } else {
-            ret.push('<a class="page-link" href="/'+pages[i].path+'">' + (parseInt(i)+1) + '</a>');
+            ret.push('<a class="pagination-link" href="/'+pages[i].path+'">' + (parseInt(i)+1) + '</a>');
         }
+    }
+    if (ret.length == 1) {
+        return [];
     }
     return ret.join('');
 });
 
-function categoryset(opts) {
+function categorySet(opts) {
     return function(files, metalsmith, done) {
         for (var f in files) {
             if (files[f].categories) {
                 files[f].categories = new Set(files[f].categories.split(' '));
             }
+        }
+        done();
+    }
+}
+
+function formatPostDates(opts) {
+    return function(files, metalsmith, done) {
+        for (var post of metalsmith._metadata.collections.posts) {
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            var date = new Date(post.date);
+            post.date = months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+        }
+        done();
+    }
+}
+
+function setPostHeaderFields(opts) {
+    return function(files, metalsmith, done) {
+        for (var post of metalsmith._metadata.collections.posts) {
+            post.headerTitle = 'Posts';
+            post.headerLink = '/posts';
+        }
+        done();
+    }
+}
+
+function copyPostContents(opts) {
+    return function(files, metalsmith, done) {
+        for (var post of metalsmith._metadata.collections.posts) {
+            post.original = post.contents.slice();
         }
         done();
     }
@@ -56,12 +91,28 @@ Metalsmith(__dirname)
             author: 'Stephen Sherratt'
         }
     })
+    .use(serve({
+        port: 8000,
+        verbose: true
+    }))
     .use(ignore([
         '.*.swp',
         '*/.*.swp'
     ]))
-    .use(markdown())
-    .use(categoryset())
+    .use(markdown({
+        html: true,
+        highlight: function (str, lang) {
+            if (lang && hljs.getLanguage(lang)) {
+                try {
+                    return hljs.highlight(lang, str).value;
+                } catch (err) {}
+            }
+            try {
+                return hljs.highlightAuto(str).value;
+            } catch (err) {}
+            return ''; // use external default escaping
+          }}))
+    .use(categorySet())
     .use(excerpts())
     .use(sass({
         outputStyle: 'expanded'
@@ -73,23 +124,23 @@ Metalsmith(__dirname)
             reverse: true
         }
     }))
-    .use(function(files, metalsmith, done) {
-        for (var post of metalsmith._metadata.collections.posts) {
-            post.headerTitle = 'Posts';
-            post.headerLink = '/posts';
-        }
-        done();
-    })
+    .use(formatPostDates())
+    .use(setPostHeaderFields())
+    .use(copyPostContents())
     .use(feed({
-        collection: 'posts'
+        collection: 'posts',
+        limit: false,
+        postDescription: (file) => {
+            return file.contents;
+        }
     }))
     .use(permalinks({
         pattern: ':permalink'
     }))
     .use(pagination({
         'collections.posts': {
-            perPage: 2,
-            layout: 'pagination.hbt',
+            perPage: 4,
+            layout: 'home.hbt',
             first: 'index.html',
             path: ':num/index.html',
             pageMetadata: {
@@ -99,7 +150,7 @@ Metalsmith(__dirname)
     }))
     .use(pagination({
         'collections.posts': {
-            perPage: 2,
+            perPage: 10,
             layout: 'pagination.hbt',
             first: 'posts/index.html',
             path: 'posts/:num/index.html',
@@ -112,7 +163,7 @@ Metalsmith(__dirname)
     }))
      .use(pagination({
         'collections.posts': {
-            perPage: 2,
+            perPage: 10,
             layout: 'pagination.hbt',
             first: 'projects/index.html',
             path: 'projects/:num/index.html',
@@ -129,7 +180,7 @@ Metalsmith(__dirname)
     .use(function(files, metalsmith, done) {
         if (DEBUG) {
             for (var f in files) {
-                console.log(files[f]);
+                console.log(f);
             }
         }
         done();

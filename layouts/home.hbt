@@ -8,9 +8,10 @@
           <a class="post-link" href="/{{ this.permalink }}">{{ this.title }}</a>
         </h2>
         <article class="post-content">
-            {{{ this.excerpt }}}
+            {{{ this.original }}}
         </article>
         </li>
     {{/each}}
     </ul>
+    {{> pagenumbers }}
 {{> footer }}

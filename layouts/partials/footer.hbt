@@ -3,8 +3,9 @@
                 {{> rightbar }}
             </div>
         </div>
+        <div class="footer-spacer"></div>
         <footer class="site-footer">
-            Powered by METALSMITH
+            Copyright © 2016 takestairs.net
         </footer>
     </div>
 </body>
