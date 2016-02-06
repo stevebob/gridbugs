@@ -18,6 +18,7 @@ var hljs        = require('highlight.js');
 var path        = require('path');
 
 const DEBUG = false;
+const PORT = process.argv[2];
 
 Handlebars.registerPartial('header', fs.readFileSync(__dirname + '/layouts/partials/header.hbt').toString());
 Handlebars.registerPartial('footer', fs.readFileSync(__dirname + '/layouts/partials/footer.hbt').toString());
@@ -137,7 +138,7 @@ Metalsmith(__dirname)
         }
     })
     .use(serve({
-        port: 8000,
+        port: PORT,
         verbose: true
     }))
     .use(ignore([
