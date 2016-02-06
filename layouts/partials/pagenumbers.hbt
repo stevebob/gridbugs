@@ -1,0 +1,13 @@
+<div class="pagination-container">
+    <div class="pagination-outer">
+        <div class="pagination-inner">
+            {{#if pagination.previous }}
+            <a class="pagination-relativte-link" href="/{{ pagination.previous.path }}">&lt;</a>
+            {{/if}}
+            {{{getPages pagination}}}
+            {{#if pagination.next }}
+            <a class="pagination-relative-link" href="/{{ pagination.next.path }}">&gt;</a>
+            {{/if}}
+        </div>
+    </div>
+</div>
