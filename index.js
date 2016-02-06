@@ -93,7 +93,6 @@ function moveContentsUpOneLevel(opts) {
                 var fileObject = files[f];
                 files[newPath] = fileObject;
                 delete files[f];
-
             }
         }
         done();
@@ -104,7 +103,7 @@ function makePostLinksAbsolute(opts) {
     return function(files, metalsmith, done) {
         var pattern = /^https?:\/\/|^\/\/|^\//i;
         for (var post of metalsmith._metadata.collections.posts) {
-            var $ = cheerio.load(post.contents);
+            var $ = cheerio.load(post.contents.toString());
             $('a').each((index, element) => {
                 var url = element.attribs.href;
                 if (!url.match(pattern)) {
@@ -123,11 +122,13 @@ function makePostLinksAbsolute(opts) {
                     element.attribs.src = '/' + post.permalink + '/' + url;
                 }
             });
-            post.contents = new Buffer($.html());
+            var html = $.html();
+            post.contents = new Buffer(html);
         }
         done();
     }
 }
+
 
 Metalsmith(__dirname)
     .metadata({
