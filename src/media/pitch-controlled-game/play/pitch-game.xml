@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<app name="Pitch Game" url="pitch-game" url-end="" favourite="true">
+    <description>
+        Pitch controlled game
+    </description> 
+</app>

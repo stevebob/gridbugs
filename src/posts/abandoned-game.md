@@ -11,7 +11,7 @@ on what I hoped would become a top-down
 side-scrolling action-rpg. I'd just started playing Dark Souls,
 and wanted to emulate its art style and combat, but in 2D.
 
-![screenshot](/media/abandoned-game/images/screenshot.png)
+![screenshot](images/screenshot.png)
 
 My aim from the start was to quickly implement features at a basic level, rather than getting bogged down in low-level details.
 I implemented character animation, collision processing
@@ -33,23 +33,23 @@ special images to give the illusion of 3D textures.
 At this point I started to lose sight of where the project was going. The cost of adding new content was increased by the shiny new graphics
 engine, as images needed accompanying bump and light maps. I was starting to approach the limit of computation which can be done
 in a single frame on my development machine (a 2013 macbook air). I started to doubt whether top-down was really the best viewing angle for
-the task at hand, and wondered if [3/4 perspective](/media/abandoned-game/images/lttp.jpg) would be more appropriate, or if purely top-down implied
-a more [minimal art style](/media/abandoned-game/images/teleglitch.jpg). I experimented with different styles of drawing but couldn't settle
+the task at hand, and wondered if [3/4 perspective](images/lttp.jpg) would be more appropriate, or if purely top-down implied
+a more [minimal art style](images/teleglitch.jpg). I experimented with different styles of drawing but couldn't settle
 on anything I both liked and had the skill to create.
 
 Eventually I decided I'd have better luck starting a new project from scratch. I learnt a lot about computer graphics and also about
 how not to go about creating a game.
 
 I decided to stop working on this project on a Friday night, and while liberating, it was also frustrating, so to prove
-to myself that I could actually make games, I spent the weekend making [this little platform game](/media/abandoned-game/little-platform-game/).
+to myself that I could actually make games, I spent the weekend making [this little platform game](little-platform-game/).
 
 ## Runnable versions of game engine (runs in browser)
-- [Large area with buggy dynamic lighting and shaders](/media/abandoned-game/big-shaders/)
-- [Large area with dynamic lighting but no shaders](/media/abandoned-game/big-noshaders/)
-- [Small area with dynamic lighting but no shaders](/media/abandoned-game/small/)
+- [Large area with buggy dynamic lighting and shaders](/top-down-sidescrolling-engine/play/)
+- [Large area with dynamic lighting but no shaders](big-noshaders/)
+- [Small area with dynamic lighting but no shaders](small/)
 
 ## Shader demos
-- [Irregular pavement shader demo](/media/abandoned-game/pavement-phong/artwork/shaders/irreular_pavement/)
-- [Tiles shader demo](/media/abandoned-game/tiles-phong/)
-- [Waves shader demo](/media/abandoned-game/waves-phong/)
+- [Irregular pavement shader demo](pavement-phong/artwork/shaders/irreular_pavement/)
+- [Tiles shader demo](/2d-phong-illumination-in-webgl/demo/)
+- [Waves shader demo](waves-phong/)
 

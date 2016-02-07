@@ -14,7 +14,7 @@ by 2D grids.
 This makes it suitable for use in roguelikes.
 This post will explain the recursive shadowcast algorithm.
 
-![](/media/recursive-shadowcast/images/dcss0.png)
+![](images/dcss0.png)
 
 <p class="label">Screenshot from Dungeon Crawl Stone Soup demonstrating its
 visible area detection</p>
@@ -26,12 +26,12 @@ detection. Below is an environment that will be used throughout this post. White
 cells are empty and black cells are opaque walls. The scene is viewed from the cell
 containing the red cross.
 
-![](/media/recursive-shadowcast/images/example0.png)
+![](images/example0.png)
 
 The yellow-shaded area in the image below is visible from the centre of the
 observer's cell.
 
-![](/media/recursive-shadowcast/images/example1.png)
+![](images/example1.png)
 
 Note that some cells are partially inside the visible area.
 To simplify explanations, these cells will be considered to be completely
@@ -39,12 +39,12 @@ visible.
 
 The visible floor cells are shown below.
 
-![](/media/recursive-shadowcast/images/example2.png)
+![](images/example2.png)
 
 If at least one edge of a wall cell is visible, it
 is considered visible. Visible wall cells are shown below.
 
-![](/media/recursive-shadowcast/images/example3.png)
+![](images/example3.png)
 
 ## Recursive Shadowcast
 
@@ -62,7 +62,7 @@ Recursive shadowcast considers the space to be made up of 8 octants, centred
 at the observer. Each coloured segment in the image below is a single
 octant. The visible area is computed independently on each octant.
 
-![](/media/recursive-shadowcast/images/example4.png)
+![](images/example4.png)
 
 If a cell lies on the border of 2 octants, it is considered to be in both. This
 implies that some cells are in 2 octants. It would be trivial to keep track of
@@ -72,7 +72,7 @@ while processing two different octants if necessary.
 To clarify the point above, shaded in blue below are all the cells in a single
 octant.
 
-![](/media/recursive-shadowcast/images/example5.png)
+![](images/example5.png)
 
 Note also that the cell containing the observer isn't part of any octant.
 Generally, the cell containing the observer is always visible, regardless of the
@@ -83,7 +83,7 @@ opacity of the cells around them.
 The simplest way to explain this algorithm is to jump right in with an example.
 We'll first consider this octant.
 
-![](/media/recursive-shadowcast/images/example6.png)
+![](images/example6.png)
 
 As we compute the visible area in this octant, we'll be keeping track of a few
 variables:
@@ -107,7 +107,7 @@ its cell. That is, if the eye is in cell at coordinates (2, 3), the actual
 absolute position of the eye would be (2.5, 3.5) (assuming (0, 0) is the
 coordinate of the top-left corner of the grid).
 
-![](/media/recursive-shadowcast/images/example7.png)
+![](images/example7.png)
 
 We'll scan the current depth from west to east. Each cell that is visited is
 considered to be visible. If an opaque cell is
@@ -115,8 +115,7 @@ encountered, recurse, incrementing the depth, and adjusting the min and max
 slope such that the opaque cell obscures vision at the next depth level. This
 process is documented more concretely in the following pseudocode.
 
-{% highlight lua %}
-
+```lua
 computeVisibleArea(current_depth, min_slope, max_slope) {
 
   first = true;
@@ -161,8 +160,7 @@ C:  computeVisibleArea(current_depth+1, min_slope, max_slope);
   }
     
 }
-
-{% endhighlight %}
+```
 
 The interesting parts of the code are labelled with A, B and C. We'll visit each
 case as we work through the example octant.
@@ -176,7 +174,7 @@ west to east), which is transparent. Thus we recurse to depth 2, leaving the
 `min_slope` and `max_slope` arguments unchanged as they are passed to the
 recursive call.
 
-![](/media/recursive-shadowcast/images/example8.png)
+![](images/example8.png)
 
 Depth 2 is the same as depth 1 in that none of the cells are visible, so we will
 skip it and move straight on to depth 3, which is much more interesting. Unlike
@@ -206,7 +204,7 @@ opaque cell.
 Unlike the previous depths, case C is not reached, as the last cell visited at
 this depth is not transparent.
 
-![](/media/recursive-shadowcast/images/example9.png)
+![](images/example9.png)
 
 Depth 4 is reached by 2 separate recursive calls. It's important to note here
 that all cells even partially inside the area between a pair of coloured lines
@@ -216,7 +214,7 @@ will hit case A, though note that `next_max_slope` (the dotted line below) will
 be less than (ie. to the left of) `min_slope`. This means no cells could be
 between then. Thus the blue instance stops here.
 
-![](/media/recursive-shadowcast/images/example10.png)
+![](images/example10.png)
 
 The final case to consider in this example is the very last recursion of the
 green instance. Shown below, this case is unique as no cells in the scan
@@ -224,12 +222,12 @@ are transparent. Stepping through the code, we see that each cell is marked as
 visible (as normal), but neither case A, nor C are hit, meaning no recursion is
 made, and execution stops.
 
-![](/media/recursive-shadowcast/images/example11.png)
+![](images/example11.png)
 
 The shaded cells in the image below are all the cells marked as visible in this
 octant using recursive shadowcast.
 
-![](/media/recursive-shadowcast/images/example12.png)
+![](images/example12.png)
 
 ## Generalizing to all Octants
 
@@ -254,7 +252,7 @@ The image below shows the direction to move in the grid as the `depth`
 increases. In the north-most octants we move north, in the east-most we move
 east, and so on.
 
-![](/media/recursive-shadowcast/images/example13.png)
+![](images/example13.png)
 
 <p class="label">Depth Direction</p>
 
@@ -262,7 +260,7 @@ Closely relate to this is the scan direction. It can be derived from the depth
 direction: if you stand facing the depth direction for an octant, the scan
 direction for that octant will be from your left, to your right.
 
-![](/media/recursive-shadowcast/images/example16.png)
+![](images/example16.png)
 
 <p class="label">Scan Direction</p>
 
@@ -271,7 +269,7 @@ Tied into the above two characteristics is the initial values of `min_slope` and
 direction), if you stand facing the depth direction, the octant to your left
 would have slopes ranging from -1 to 0, and the octant to your right from 0 to 1.
 
-![](/media/recursive-shadowcast/images/example15.png)
+![](images/example15.png)
 
 <p class="label">Initial values for <code>min_slope</code> and
 <code>max_slope</code></p>
@@ -285,7 +283,7 @@ based on one of its corners. This is the southwest corner in the example.
 Which corners to choose in this cases is octant-dependent, and is shown in the
 diagram below.
 
-![](/media/recursive-shadowcast/images/example14.png)
+![](images/example14.png)
 
 <p class="label">Cell corners to use for finding slopes</p>
 
@@ -294,8 +292,7 @@ be used to derive others. Despite this, for simplicity, when computing the
 visible area for a given octant, let's just pass all the characteristics as
 arguments:
 
-{% highlight lua %}
-
+```lua
 computeVisibleArea(current_depth, min_slope, max_slope,
                    depth_direction, scan_direction,
                    opaque_corner, transparent_corner) {
@@ -345,8 +342,7 @@ C:  computeVisibleArea(current_depth+1, min_slope, max_slope,
                        opaque_corner, transparent_corner);
   }
 }
- 
-{% endhighlight %}
+```
 
 ## Iterative Shadowcast
 
@@ -359,8 +355,7 @@ We'll need a data structure representing state once represented by a recursive
 call. The arguments that could change with each recursive call are `depth`,
 `min_slope` and `max_slope`. Thus, our structure will look like:
 
-{% highlight lua %}
-
+```lua
 class StackFrame {
   depth;
   min_slope;
@@ -372,13 +367,11 @@ class StackFrame {
     this.max_slope = max_slope;
   }
 }
-
-{% endhighlight %}
+```
 
 Using this, and an assumed Stack data structure, the code becomes:
 
-{% highlight lua %}
-
+```lua
 computeVisibleArea(initial_min_slope, initial_max_slope,
                    depth_direction, scan_direction,
                    opaque_corner, transparent_corner) {
@@ -448,8 +441,7 @@ C:    next_frame = new StackFrame(current_depth+1,
     }
   }
 }
-
-{% endhighlight %}
+```
 
 All the recursive calls were replaced with creating a new object with the
 information that would have been passed to the recursive call, and pushing it
@@ -473,8 +465,7 @@ octant, giving it the relevant arguments for that octant. The following function
 does this, starting with the octant in the example above, going around
 clockwise.
 
-{% highlight lua %}
-
+```lua
 computeTotalVisibleArea() {
   computeVisibleArea(0, 1,  North, East, NorthWest, SouthWest);
   computeVisibleArea(-1, 0, East, South, NorthWest, NorthEast);
@@ -485,5 +476,4 @@ computeTotalVisibleArea() {
   computeVisibleArea(0, 1,  West, North, SouthWest, SouthEast);
   computeVisibleArea(-1, 0, North, East, SouthWest, NorthWest);
 }
-
-{% endhighlight %}
+```

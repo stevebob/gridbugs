@@ -27,7 +27,7 @@ drawn onto the surface, and are used when shading fragments (pixels) to
 determine exactly how light should behave.
 
 A demo that uses this technique is
-[here](/media/2d-phong-illumination-in-webgl/tiles-phong/).
+[here](demo)
 
 For the tiles demo, I use two maps. The __bump map__ stores the surface normal
 (vector at right angle to the surface at a point)
@@ -51,14 +51,14 @@ representing the amount of ambient light present. Different surfaces may
 reflect a different amount of ambient light. It does not change with the viewing
 angle.
 
-![Ambient Example](/media/2d-phong-illumination-in-webgl/images/ambient_example.png)
+![Ambient Example](images/ambient_example.png)
 
 __Diffuse__ lighting is light from a point light source hitting a surface and
 illuminating it. The amount of light reflected by a point on a surface is
 dependant on the angle between the light source and surface normal at that
 point. Here's a diagram:
 
-![Diffuse Diagram](/media/2d-phong-illumination-in-webgl/images/diffuse_diagram.png)
+![Diffuse Diagram](images/diffuse_diagram.png)
 
 The more similar the two vectors, the brighter the light. This is computed in
 practice by multiplying the intensity of the light by the dot product of the two
@@ -67,7 +67,7 @@ coefficient, thus different surfaces may reflect a different amount of diffuse
 light. If there are multiple light sources in a scene, compute the diffuse
 intensity for each light and add them together.
 
-![Diffuse Example](/media/2d-phong-illumination-in-webgl/images/diffuse_example.png)
+![Diffuse Example](images/diffuse_example.png)
 
 
 __Specular__ lighting computes the "shiny" bits of a surface. When you look at polished wood, metal
@@ -77,7 +77,7 @@ difference between the angle from a ray reflected from the light at that point
 and a vector from that point to the eye.
 In the diagram below, the relevant vectors are coloured red and green.
 
-![Specular Diagram](/media/2d-phong-illumination-in-webgl/images/specular_diagram.png)
+![Specular Diagram](images/specular_diagram.png)
 
 The intensity of the light is the dot product of the two relevant vectors raised
 to some power. The higher the power, the smaller and more intense the highlights
@@ -86,7 +86,7 @@ surfaces specular reflection coefficient and light brightness. If there are
 multiple specular lights in an area, compute the specular intensity for each and
 add them together.
 
-![Specular Example](/media/2d-phong-illumination-in-webgl/images/specular_example.png)
+![Specular Example](images/specular_example.png)
 
 Once the intensity of each type of lighting is computed for a point, just add
 them all together to get the total lighting at that point. In the tile example,
@@ -96,7 +96,7 @@ then add on the specular lighting as a vector (i, i, i, 0) where 'i' is the
 specular light intensity. This is because I wanted the specular highlights to
 appear white rather than draw from the underlying colour.
 
-![Phong Example](/media/2d-phong-illumination-in-webgl/images/phong_example.png)
+![Phong Example](images/phong_example.png)
 
 ## Map Encoding Scheme
 I store maps in bitmap files that I made using GIMP.
@@ -115,12 +115,12 @@ tile demo. These are:
 
 ### Tile Texture
 
-![Tile Texture](/media/2d-phong-illumination-in-webgl/tiles-phong/tile.png)
+![Tile Texture](demo/tile.png)
 
 A simple texture. It's used to determine the colour of each pixel.
 
 ### Bump Map
-![Bump Map](/media/2d-phong-illumination-in-webgl/tiles-phong/bump_map.png)
+![Bump Map](demo/bump_map.png)
 
 For each pixel, this encodes the surface normal vector and depth at that pixel.
 Normal vectors are represented by a pair of angles. The diagram below shows the
@@ -130,14 +130,14 @@ between 90° and -90°. As the tile scene is viewed from above, for the purposes
 of this example, the vertical angle will be constrained between 90° and 0°. The
 length of normal vectors is always 1.
 
-![Angles](/media/2d-phong-illumination-in-webgl/images/angles.png)
+![Angles](images/angles.png)
 
 Different information is encoded in each channel, so it makes sense to examine
 one channel at a time.
 
 #### Red (Horizontal Angle)
 
-![Bump Map Red](/media/2d-phong-illumination-in-webgl/tiles-phong/bump_map_red.png)
+![Bump Map Red](demo/bump_map_red.png)
 
 This channel encodes the horizontal angle of the surface normal.
 A value of 0 denotes 0°, 64 (256/4) denotes 90° (360°/4) and so on.
@@ -146,7 +146,7 @@ the normal is 0°.
 
 #### Green (Vertical Angle)
 
-![Bump Map Green](/media/2d-phong-illumination-in-webgl/tiles-phong/bump_map_green.png)
+![Bump Map Green](demo/bump_map_green.png)
 
 This channel encodes the vertical angle of the surface normal.
 Values are linearly interpolated between 0° and 90°.
@@ -156,7 +156,7 @@ straight up.
 
 #### Blue (Depth)
 
-![Bump Map Blue](/media/2d-phong-illumination-in-webgl/tiles-phong/bump_map_blue.png)
+![Bump Map Blue](demo/bump_map_blue.png)
 
 The image above is slightly blue though it's hard to see.
 It represents the height in pixel-sized units of each pixel.
@@ -165,22 +165,22 @@ picture is rgb(0, 0, 8) which looks almost black.
 
 ### Light Map
 
-![Light Map](/media/2d-phong-illumination-in-webgl/tiles-phong/light_map.png)
+![Light Map](demo/light_map.png)
 
 This stores the ambient, diffuse and specular reflection coefficients in the
 red, green and blue channels respectively.
 
 #### Red (Ambient)
 
-![Light Map Red](/media/2d-phong-illumination-in-webgl/tiles-phong/light_map_red.png)
+![Light Map Red](demo/light_map_red.png)
 
 #### Green (Diffuse)
 
-![Light Map Green](/media/2d-phong-illumination-in-webgl/tiles-phong/light_map_green.png)
+![Light Map Green](demo/light_map_green.png)
 
 #### Blue (Specular)
 
-![Light Map Blue](/media/2d-phong-illumination-in-webgl/tiles-phong/light_map_blue.png)
+![Light Map Blue](demo/light_map_blue.png)
 
 The grout between tiles isn't very shiny, so it has a low specular reflection
 coefficient
@@ -190,4 +190,4 @@ This indicates how shiny each pixel is. It is used to determine the specular
 exponent (the power to which the dot product is raised wen computing specular
 lighting). Only one channel is used for this, and values can range from 0 to 255. 
 
-![Shine Map](/media/2d-phong-illumination-in-webgl/tiles-phong/shine_map.png)
+![Shine Map](demo/shine_map.png)
