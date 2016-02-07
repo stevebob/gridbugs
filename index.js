@@ -4,7 +4,6 @@ var layouts     = require('metalsmith-layouts');
 var collections = require('metalsmith-collections');
 var permalinks  = require('metalsmith-permalinks');
 var tags        = require('metalsmith-tags');
-var drafts      = require('metalsmith-drafts');
 var pagination  = require('metalsmith-pagination');
 var ignore      = require('metalsmith-ignore');
 var excerpts    = require('metalsmith-excerpts');
