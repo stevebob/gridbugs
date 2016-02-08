@@ -1,7 +1,7 @@
 ---
 layout: post.hbt
 title: "Bug Catcher"
-date:   2016-02-09
+date:   2016-02-09 23:49:01+1000
 categories: gamedev roguelikes
 permalink: bugcatcher
 ---
