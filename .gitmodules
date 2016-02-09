@@ -1,0 +1,3 @@
+[submodule "src/media/bugcatcher/play"]
+	path = src/media/bugcatcher/play
+	url = sherra.tt:git/esrl
