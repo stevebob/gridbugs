@@ -15,7 +15,7 @@ ideas and programming techniques.
 
 ## How do I contact you?
 
-**Email:** [steve@takestairs.net](mailto:steve@takestairs.net)
+**Email:** [stephen@sherra.tt](stephen@sherra.tt)
 
 **Github:** [github.com/stevebob](https://github.com/stevebob)
 
