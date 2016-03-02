@@ -19,7 +19,9 @@
     "metalsmith-permalinks": "*",
     "metalsmith-sass": "*",
     "metalsmith-serve": "*",
-    "metalsmith-tags": "*"
+    "metalsmith-tags": "*",
+    "metalsmith-watch": "*",
+    "chokidar": "*"
   },
   "repository": {
     "type": "git",
@@ -28,5 +30,8 @@
   "bugs": {
     "url": "https://github.com/stevebob/takestairs/issues"
   },
-  "homepage": "https://github.com/stevebob/takestairs#readme"
+  "homepage": "https://github.com/stevebob/takestairs#readme",
+  "dependencies": {
+    "yargs": "^4.2.0"
+  }
 }

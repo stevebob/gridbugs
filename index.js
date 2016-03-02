@@ -9,8 +9,9 @@ var ignore      = require('metalsmith-ignore');
 var excerpts    = require('metalsmith-excerpts');
 var sass        = require('metalsmith-sass');
 var feed        = require('metalsmith-feed');
-var serve       = require('metalsmith-serve');
+var argv = require('yargs').argv
 
+var chokidar    = require('chokidar');
 var cheerio     = require('cheerio');
 var fs          = require('fs');
 var Handlebars  = require('handlebars');
@@ -18,7 +19,6 @@ var hljs        = require('highlight.js');
 var path        = require('path');
 
 const DEBUG = false;
-const PORT = process.argv[2];
 
 Handlebars.registerPartial('header', fs.readFileSync(__dirname + '/layouts/partials/header.hbt').toString());
 Handlebars.registerPartial('footer', fs.readFileSync(__dirname + '/layouts/partials/footer.hbt').toString());
@@ -129,110 +129,117 @@ function makePostLinksAbsolute(opts) {
     }
 }
 
-
-Metalsmith(__dirname)
-    .metadata({
-        site: {
-            title:  'Take the Stairs',
-            url:    'http://takestairs.net',
-            author: 'Stephen Sherratt'
-        }
-    })
-    .use(serve({
-        port: PORT,
-        verbose: true
-    }))
-    .use(ignore([
-        '.*.swp',
-        '*/.*.swp'
-    ]))
-    .use(moveContentsUpOneLevel('media'))
-    .use(markdown({
-        html: true,
-        highlight: function (str, lang) {
-            if (lang && hljs.getLanguage(lang)) {
+function compile() {
+    Metalsmith(__dirname)
+        .metadata({
+            site: {
+                title:  'Take the Stairs',
+                url:    'http://takestairs.net',
+                author: 'Stephen Sherratt'
+            }
+        })
+        .use(ignore([
+            '.*.swp',
+            '*/.*.swp'
+        ]))
+        .use(moveContentsUpOneLevel('media'))
+        .use(markdown({
+            html: true,
+            highlight: function (str, lang) {
+                if (lang && hljs.getLanguage(lang)) {
+                    try {
+                        return hljs.highlight(lang, str).value;
+                    } catch (err) {}
+                }
                 try {
-                    return hljs.highlight(lang, str).value;
+                    return hljs.highlightAuto(str).value;
                 } catch (err) {}
+                return ''; // use external default escaping
+              }}))
+        .use(categorySet())
+        .use(excerpts())
+        .use(sass({
+            outputStyle: 'expanded'
+        }))
+        .use(collections({
+            posts: {
+                pattern: 'posts/*.html',
+                sortBy: 'date',
+                reverse: true
             }
-            try {
-                return hljs.highlightAuto(str).value;
-            } catch (err) {}
-            return ''; // use external default escaping
-          }}))
-    .use(categorySet())
-    .use(excerpts())
-    .use(sass({
-        outputStyle: 'expanded'
-    }))
-    .use(collections({
-        posts: {
-            pattern: 'posts/*.html',
-            sortBy: 'date',
-            reverse: true
-        }
-    }))
-    .use(makePostLinksAbsolute())
-    .use(formatPostDates())
-    .use(setPostHeaderFields())
-    .use(copyPostContents())
-    .use(feed({
-        collection: 'posts',
-        limit: false,
-        postDescription: (file) => {
-            return file.contents;
-        }
-    }))
-    .use(permalinks({
-        pattern: ':permalink'
-    }))
-    .use(pagination({
-        'collections.posts': {
-            perPage: 4,
-            layout: 'pagination-full.hbt',
-            first: 'index.html',
-            path: ':num/index.html',
-            pageMetadata: {
-                title: 'Take the Stairs',
+        }))
+        .use(makePostLinksAbsolute())
+        .use(formatPostDates())
+        .use(setPostHeaderFields())
+        .use(copyPostContents())
+        .use(feed({
+            collection: 'posts',
+            limit: false,
+            postDescription: (file) => {
+                return file.contents;
             }
-        }
-    }))
-    .use(pagination({
-        'collections.posts': {
-            perPage: 10,
-            layout: 'pagination-excerpts.hbt',
-            first: 'posts/index.html',
-            path: 'posts/:num/index.html',
-            pageMetadata: {
-                title: 'Posts',
-                headerTitle: 'Posts',
-                headerLink: '/posts'
+        }))
+        .use(permalinks({
+            pattern: ':permalink'
+        }))
+        .use(pagination({
+            'collections.posts': {
+                perPage: 4,
+                layout: 'pagination-full.hbt',
+                first: 'index.html',
+                path: ':num/index.html',
+                pageMetadata: {
+                    title: 'Take the Stairs',
+                }
             }
-        }
-    }))
-     .use(pagination({
-        'collections.posts': {
-            perPage: 10,
-            layout: 'pagination-full.hbt',
-            first: 'projects/index.html',
-            path: 'projects/:num/index.html',
-            filter: (page) => {
-                return page.categories && page.categories.has('project');
-            },
-            pageMetadata: {
-                title: 'Projects',
-                headerTitle: 'Projects',
-                headerLink: '/projects'
+        }))
+        .use(pagination({
+            'collections.posts': {
+                perPage: 10,
+                layout: 'pagination-excerpts.hbt',
+                first: 'posts/index.html',
+                path: 'posts/:num/index.html',
+                pageMetadata: {
+                    title: 'Posts',
+                    headerTitle: 'Posts',
+                    headerLink: '/posts'
+                }
             }
-        }
-    }))
-    .use(function(files, metalsmith, done) {
-        if (DEBUG) {
-            for (var f in files) {
-                console.log(f);
+        }))
+         .use(pagination({
+            'collections.posts': {
+                perPage: 10,
+                layout: 'pagination-full.hbt',
+                first: 'projects/index.html',
+                path: 'projects/:num/index.html',
+                filter: (page) => {
+                    return page.categories && page.categories.has('project');
+                },
+                pageMetadata: {
+                    title: 'Projects',
+                    headerTitle: 'Projects',
+                    headerLink: '/projects'
+                }
             }
-        }
-        done();
-    })
-    .use(layouts('handlebars'))
-    .build((err) => { if (err) { throw  err; } });
+        }))
+        .use(function(files, metalsmith, done) {
+            if (DEBUG) {
+                for (var f in files) {
+                    console.log(f);
+                }
+            }
+            done();
+        })
+        .use(layouts('handlebars'))
+        .build((err) => { if (err) { throw  err; } });
+}
+
+compile();
+
+if (argv.stream) {
+    chokidar.watch(['src'], ['layouts']).on('change', (event, path) => {
+      console.log(event, path);
+      compile();
+    });
+}
+
