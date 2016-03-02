@@ -11,7 +11,7 @@ be encoded. The engine needs a way of enforcing statements such as "Doors can
 only be passed through if they are open", and "If a burning character walks into
 a pool of water, it stops burning". The expressiveness of a game engine's
 rule-encoding is important, as it dictates the limitations of mechanics that can
-be present in games. Nobody wants to discover late in development that their
+be implemented in games. Nobody wants to discover late in development that their
 engine can't be used to efficiently implement a certain feature.
 
 This post will describe the framework I used to encode rules in two games I
