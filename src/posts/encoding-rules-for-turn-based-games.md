@@ -49,10 +49,31 @@ Component-Entity-Systems](http://www.gamedev.net/page/resources/_/technical/game
 - Another index of references from roguebasin:
 [Entity Component System](http://www.roguebasin.com/index.php?title=Entity_Component_System)
 
-## Entities
-## Components
 ## Actions
-## Passive Systems
-## Reactive Systems
-## Periodic Systems
-## Game Loop
+
+## Implementation
+### ECS Context
+An ECS context stores all the relevant data for the entity component system.
+This consists of a set of all entities, and all the systems encoding the rules
+of the game.
+
+Since all the games I've written using this engine have been dungeon crawlers where the dungeon is
+made up of multiple levels, I've used a separate ECS context per level. This
+makes reduces the number of entities that need to be considered by the engine at
+any point. The trade-off is this makes reasoning about events spanning multiple
+levels more complex. These events occur infrequently. The only such events I've
+dealt with are climbing up and down stairs.
+
+### Components
+All data about things in the game world are stored in components. A component
+may be part of at most one entity. The component maintains a reference to its
+entity, and a component-specific implementation of an `onAdd` and `onRemove` method to
+be called when the component is added to or removed from an entity.
+
+### Entities
+### Entity Storage
+### Actions
+### Passive Systems
+### Reactive Systems
+### Periodic Systems
+### Game Loop
