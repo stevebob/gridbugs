@@ -11,7 +11,6 @@ var sass        = require('metalsmith-sass');
 var feed        = require('metalsmith-feed');
 var argv = require('yargs').argv
 
-var chokidar    = require('chokidar');
 var cheerio     = require('cheerio');
 var fs          = require('fs');
 var Handlebars  = require('handlebars');
@@ -235,11 +234,3 @@ function compile() {
 }
 
 compile();
-
-if (argv.stream) {
-    chokidar.watch(['src'], ['layouts']).on('change', (event, path) => {
-      console.log(event, path);
-      compile();
-    });
-}
-
