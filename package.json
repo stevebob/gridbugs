@@ -20,7 +20,8 @@
     "metalsmith-sass": "*",
     "metalsmith-serve": "*",
     "metalsmith-tags": "*",
-    "metalsmith-watch": "*"
+    "metalsmith-watch": "*",
+    "yargs": "*"
   },
   "repository": {
     "type": "git",
