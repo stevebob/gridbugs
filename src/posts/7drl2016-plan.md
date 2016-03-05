@@ -1,7 +1,7 @@
 ---
 layout: post.hbt
 title: "7 Day Roguelike 2016: Plan"
-date:   2016-03-05 10:00:06+1000
+date:   2016-03-05 10:06:00+1000
 categories: gamedev roguelikes 7drl
 permalink: 7drl2016-plan
 ---
