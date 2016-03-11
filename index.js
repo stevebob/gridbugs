@@ -59,7 +59,11 @@ function formatPostDates(opts) {
             var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             var date = new Date(post.date);
             post.date = months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+            post.epoch = date.getTime();
         }
+        metalsmith._metadata.collections.posts.sort((a, b) => {
+            return b.epoch - a.epoch;
+        });
         done();
     }
 }
