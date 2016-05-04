@@ -2,7 +2,7 @@
 layout: post.hbt
 title: "Visible Area Detection with Recursive Shadowcast"
 date:   2015-11-16 12:30:01+1000
-categories: gamedev roguelikes
+categories: gamedev roguelikes algorithms
 permalink: visible-area-detection-recursive-shadowcast
 ---
 
