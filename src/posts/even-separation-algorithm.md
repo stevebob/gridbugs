@@ -61,7 +61,7 @@ definition of "as spread out as possible"? How can we make this line more straig
 This sequence can be thought of as groups of <span class="arrows">⇗</span>
 separated by <span class="arrows">⇒</span>. The sizes of these groups in the
 order they appear is: 1 1 2.
-What if we apply the same separation property to this sequence. There are more
+What if we apply the same separation property to this sequence? There are more
 1s than 2s, so no two 1s should be adjacent. Groups of 1s should be separated by
 individual 2s. Thus the sequence becomes: 1 2 1.
 
@@ -170,7 +170,7 @@ function spread(a, b, na, nb) {
      let numSmallGroups = numGroups - numLargeGroups;
 
      /* In the "aaa b aaaa b aaa b aaaa b aaa" example:
-      * na == 13
+      * na == 17
       * nb == 4
       * numGroups == 5
       * smallGroupSize == 3
