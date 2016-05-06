@@ -18,9 +18,9 @@ Play in browser:
 - [Run 7DRL version in browser (won't be updated after 7drl)](http://games.takestairs.net/skeleton-crew-7drl-2016)
 
 Dowload (bundled with node webkit):
-- [Linux](downloads/skeleton-crew-linux-x64.zip)
-- [Mac OSX](downloads/skeleton-crew-mac-x64.zip)
-- [Windows](downloads/skeleton-crew-linux-x64.zip)
+- [Linux](/downloads/skeleton-crew-linux-x64.zip)
+- [Mac OSX](/downloads/skeleton-crew-osx-x64.zip)
+- [Windows](/downloads/skeleton-crew-windows-x64.zip)
 
 Source code
 - [Source code on github](https://github.com/stevebob/skeleton-crew)
