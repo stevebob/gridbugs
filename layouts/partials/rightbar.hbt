@@ -1,4 +1,15 @@
 <ul class="sidebar-list">
+    <li>
+        <a class="sidebar-link" href="/rss.xml">
+            <div class="media-image-link">
+                <img class="media-icon" src="/images/rss.png"/>
+                <p class="media-text">RSS</p>
+            </div>
+        </a>
+    </li>
+</ul>
+
+<ul class="sidebar-list">
     {{#each collections.posts }}
     <li>
         <a class="sidebar-link" href="/{{ this.permalink }}">{{ this.title }}</a>

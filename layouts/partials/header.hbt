@@ -17,7 +17,8 @@
                 <span class="site-title">
                     <a href="/">Take the Stairs</a>
                     {{#if headerLink }}
-                    &gt; <a href="{{ headerLink }}">{{ headerTitle }}</a>
+                    <span class="title-separator">&gt;</span>
+                    <a href="{{ headerLink }}">{{ headerTitle }}</a>
                     {{/if}}
                 </span>
 
