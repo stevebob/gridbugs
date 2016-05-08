@@ -53,7 +53,7 @@ for each coordinate visible according to recursive shadowcast:
 
     knowledgeCell.clear() # remove all shadow entities from the cell
     for each entity in that cell:
-        knoweldgeCell.see(entity) # makes a shadow entity
+        knowledgeCell.see(entity) # makes a shadow entity
 
 ```
 

@@ -12,13 +12,13 @@ span.arrows {
 }
 </style>
 
-This post describes an algorithm for evenly spreading out a of sequence items made
+This post describes an algorithm for evenly spreading out a sequence of items made
 up of
 two distinct types of item. I came up with it when attempting to draw straight
 lines on a grid, where lines are represented by discrete steps in one of two
 directions. In order for such a line to appear straight, the steps in one
 direction should be spread out as much as possible with respect to the steps in
-the other direction. The solution generalizes to any spreading out any sequence
+the other direction. The solution generalizes to spreading out any sequence
 made up of two distinct types of item that are repeated a number of times.
 
 ![straight-line-screenshot](images/straight-line-screenshot.png)
