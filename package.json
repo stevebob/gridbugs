@@ -1,5 +1,5 @@
 {
-  "name": "takestairs",
+  "name": "gridbugs",
   "version": "0.0.1",
   "description": "A blog about game development",
   "main": "index.js",
@@ -25,12 +25,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stevebob/takestairs.git"
+    "url": "git+https://github.com/stevebob/gridbugs.git"
   },
   "bugs": {
-    "url": "https://github.com/stevebob/takestairs/issues"
+    "url": "https://github.com/stevebob/gridbugs/issues"
   },
-  "homepage": "https://github.com/stevebob/takestairs#readme",
+  "homepage": "https://github.com/stevebob/gridbugs#readme",
   "dependencies": {
     "yargs": "^4.2.0"
   }

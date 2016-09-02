@@ -13,9 +13,9 @@ generated spaceship. Damaging the hull of the ship causes sections of the ship
 to be depressurized, and their contents sucked into space, including you!
 
 Play in browser:
-- [Run in browser](http://games.takestairs.net/skeleton-crew)
-- [Run legacy version in browser (for older browsers)](http://games.takestairs.net/skeleton-crew-legacy)
-- [Run 7DRL version in browser (won't be updated after 7drl)](http://games.takestairs.net/skeleton-crew-7drl-2016)
+- [Run in browser](http://games.gridbugs.org/skeleton-crew)
+- [Run legacy version in browser (for older browsers)](http://games.gridbugs.org/skeleton-crew-legacy)
+- [Run 7DRL version in browser (won't be updated after 7drl)](http://games.gridbugs.org/skeleton-crew-7drl-2016)
 
 Dowload (bundled with node webkit):
 - [Linux](/downloads/skeleton-crew-linux-x64.zip)

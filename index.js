@@ -136,8 +136,8 @@ function compile() {
     Metalsmith(__dirname)
         .metadata({
             site: {
-                title:  'Take the Stairs',
-                url:    'http://takestairs.net',
+                title:  'Grid Bugs',
+                url:    'http://gridbugs.org',
                 author: 'Stephen Sherratt'
             }
         })
@@ -192,7 +192,7 @@ function compile() {
                 first: 'index.html',
                 path: ':num/index.html',
                 pageMetadata: {
-                    title: 'Take the Stairs',
+                    title: 'Grid Bugs',
                 }
             }
         }))
