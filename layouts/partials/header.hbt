@@ -15,7 +15,7 @@
 
             <div class="wrapper">
                 <span class="site-title">
-                    <a href="/">Take the Stairs</a>
+                    <a href="/">Grid Bugs</a>
                     {{#if headerLink }}
                     <span class="title-separator">&gt;</span>
                     <a href="{{ headerLink }}">{{ headerTitle }}</a>
