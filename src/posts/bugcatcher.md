@@ -6,7 +6,7 @@ categories: gamedev roguelikes project
 permalink: bugcatcher
 ---
 
-[Play in browser](http://games.gridbugs.org/bugcatcher)
+[Play in browser](https://gridbugs.org/play/bugcatcher)
 
 This is my first attempt at writing [one game a month](http://www.onegameamonth.com/). It's a turn-based
 dungeon crawler in the style of traditional roguelikes. All the characters in the game are bugs. Each bug

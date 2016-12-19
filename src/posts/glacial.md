@@ -6,7 +6,7 @@ categories: gamedev roguelikes project
 permalink: glacial
 ---
 
-[Play in browser](http://games.gridbugs.org/glacial)
+[Play in browser](https://gridbugs.org/play/glacial)
 
 A roguelike I made in Februrary 2016.
 
