@@ -21,7 +21,7 @@ work on other projects.
 
 Determining lit areas is the same problem as determining visible areas. I reuse
 my existing vision system [described
-here](//visible-area-detection-recursive-shadowcast).
+here](/visible-area-detection-recursive-shadowcast).
 A slight modification was required to handle the following complication.
 
 In grid based games, when computing visible area, each cell is typically either
