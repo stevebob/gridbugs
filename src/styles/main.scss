@@ -370,6 +370,7 @@ pre {
     text-align: center;
     width: 100%;
     color: $grey-color;
+    z-index: -1;
 }
 
 .footer-heading {
@@ -655,4 +656,5 @@ h2 {
 .footer-spacer {
     position: relative;
     height: 60px;
+    z-index: -1;
 }
