@@ -18,4 +18,9 @@ Download latest builds:
 - [Linux 32 bit](/downloads/howl-linux-i686-latest.zip)
 - [macOS 64 bit](/downloads/howl-darwin-x86_64-latest.zip)
 
+Controls:
+- movement: arrow keys
+- fire: f, f again to fire, arrow keys move cursor, n/m switch targets
+- close door: c followed by arrow key
+
 ![screenshot](images/screenshot.png)
