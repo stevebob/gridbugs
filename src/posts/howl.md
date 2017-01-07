@@ -11,6 +11,7 @@ is revealed under moonlight. I started this project to teach myself [the rust
 programming language](https://www.rust-lang.org), and to experiment with
 [entity component systems](https://wikipedia.org/wiki/Entity-component-system).
 
+The game is still in active development.
 Check out the [source code on github](https://github.com/stevebob/howl).
 
 Download latest builds:
