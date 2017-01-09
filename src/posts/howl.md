@@ -15,9 +15,9 @@ The game is still in active development.
 Check out the [source code on github](https://github.com/stevebob/howl).
 
 Download latest builds:
-- [Linux 64 bit](/downloads/howl-linux-x86_64-latest.zip)
-- [Linux 32 bit](/downloads/howl-linux-i686-latest.zip)
-- [macOS 64 bit](/downloads/howl-darwin-x86_64-latest.zip)
+- [Linux](/downloads/howl-linux-x86_64-latest.zip)
+- [macOS](/downloads/howl-macos-x86_64-latest.zip)
+- [Windows](/downloads/howl-windows-x86_64-latest.zip)
 
 Controls:
 - movement: arrow keys
