@@ -16,7 +16,8 @@ Check out the [source code on github](https://github.com/stevebob/howl).
 
 Download latest builds:
 - [Linux](/downloads/howl-linux-x86_64-latest.zip)
-- [macOS](/downloads/howl-macos-x86_64-latest.zip)
+  - depends on sdl2 and sdl2\_image
+- [macOS](/downloads/howl-macos-x86_64-latest.dmg)
 - [Windows](/downloads/howl-windows-x86_64-latest.zip)
 
 Controls:
