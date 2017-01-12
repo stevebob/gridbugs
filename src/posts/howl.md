@@ -15,10 +15,12 @@ The game is still in active development.
 Check out the [source code on github](https://github.com/stevebob/howl).
 
 Download latest builds:
-- [Linux](/downloads/howl-linux-x86_64-latest.zip)
-  - depends on sdl2 and sdl2\_image
-- [macOS](/downloads/howl-macos-x86_64-latest.dmg)
-- [Windows](/downloads/howl-windows-x86_64-latest.zip)
+- [Linux 64 bit](/downloads/howl-linux-x86_64-latest.zip)
+- [Linux 32 bit](/downloads/howl-linux-i686-latest.zip)
+- [macOS 64 bit](/downloads/howl-macos-x86_64-latest.dmg)
+- [Windows 64 bit](/downloads/howl-windows-x86_64-latest.zip)
+
+Note that the linux version of the game depends on sdl2 and sdl2\_images.
 
 Controls:
 - movement: arrow keys
