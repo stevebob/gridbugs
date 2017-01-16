@@ -20,7 +20,7 @@ Download latest builds:
 - [macOS 64 bit](/downloads/howl-macos-x86_64-master.dmg)
 - [Windows 64 bit](/downloads/howl-windows-x86_64-master.zip)
 
-Note that the linux version of the game depends on sdl2 and sdl2\_images.
+Note that the linux version of the game depends on sdl2, sdl2\_image, and sdl2\_ttf.
 
 Controls:
 - movement: arrow keys
