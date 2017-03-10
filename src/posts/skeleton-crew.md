@@ -17,7 +17,7 @@ Play in browser:
 - [Run legacy version in browser (for older browsers)](https://gridbugs.org/play/skeleton-crew-legacy)
 - [Run 7DRL version in browser (won't be updated after 7drl)](https://gridbugs.org/play/skeleton-crew-7drl-2016)
 
-Dowload (bundled with node webkit):
+Download (bundled with node webkit):
 - [Linux](/downloads/skeleton-crew-linux-x64.zip)
 - [Mac OSX](/downloads/skeleton-crew-osx-x64.zip)
 - [Windows](/downloads/skeleton-crew-windows-x64.zip)
