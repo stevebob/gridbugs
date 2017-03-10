@@ -73,6 +73,7 @@ function setPostHeaderFields(opts) {
         for (var post of metalsmith._metadata.collections.posts) {
             post.headerTitle = 'Posts';
             post.headerLink = '/posts';
+            post.path = post.path.match(/posts\/(.*)\.html/)[1];
         }
         done();
     }
