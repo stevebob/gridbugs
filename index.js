@@ -138,7 +138,7 @@ function compile() {
         .metadata({
             site: {
                 title:  'Grid Bugs',
-                url:    'http://gridbugs.org',
+                url:    'https://gridbugs.org',
                 author: 'Stephen Sherratt'
             }
         })
