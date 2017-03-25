@@ -5,23 +5,22 @@
   "main": "index.js",
   "author": "Stephen Sherratt",
   "license": "ISC",
+  "engine": "5",
   "devDependencies": {
-    "handlebars": "*",
-    "highlight.js": "*",
-    "metalsmith": "*",
-    "metalsmith-collections": "*",
-    "metalsmith-excerpts": "*",
-    "metalsmith-feed": "*",
-    "metalsmith-ignore": "*",
-    "metalsmith-layouts": "*",
-    "metalsmith-markdown-remarkable": "*",
-    "metalsmith-pagination": "*",
-    "metalsmith-permalinks": "*",
-    "metalsmith-sass": "*",
-    "metalsmith-serve": "*",
-    "metalsmith-tags": "*",
-    "metalsmith-watch": "*",
-    "yargs": "*"
+    "handlebars": "4.0",
+    "highlight.js": "9.9",
+    "metalsmith": "2.3",
+    "metalsmith-collections": "0.9",
+    "metalsmith-excerpts": "1.1",
+    "metalsmith-feed": "0.2",
+    "metalsmith-ignore": "0.1",
+    "metalsmith-layouts": "1.7",
+    "metalsmith-markdown-remarkable": "0.1",
+    "metalsmith-pagination": "1.4",
+    "metalsmith-permalinks": "0.5",
+    "metalsmith-sass": "1.3",
+    "metalsmith-tags": "2.0",
+    "metalsmith-watch": "1.0"
   },
   "repository": {
     "type": "git",
@@ -32,6 +31,6 @@
   },
   "homepage": "https://github.com/stevebob/gridbugs#readme",
   "dependencies": {
-    "yargs": "^4.2.0"
+    "yargs": "4.2"
   }
 }
