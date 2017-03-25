@@ -161,7 +161,7 @@ either an `Option` which may contain some data, or a `bool` denoting the
 existence of a property with no associated data.
 
 Note that there are more efficient ways to represent entities than structs of
-`Options` and `bools`. This will be covered in a later article.
+`Options` and `bools`. I'll cover this in a later article.
 
 Changing the type of an entity is now as simple as changing some of its fields:
 
