@@ -12,6 +12,17 @@ Post](https://gridbugs.itch.io/apocalypse-post). It motivates one of the
 problems I set out to solve with the engine - how to represent the types of game
 entities.
 
+## Edit
+
+In the [discussion](https://www.reddit.com/r/roguelikedev/comments/61elh1/programming_languages_make_terrible_game_engines/)
+about this post, it was pointed out that the object-oriented examples below are
+examples of bad object-oriented design. I agree with this, and I'm not trying to argue that
+it's impossible to design a good game engine using object-oriented programming.
+The examples illustrate how someone new to building game engines might attempt
+to use class inheritance to describe the types of game entities. The article
+demonstrates the problems with this approach, and suggests a non-object-oriented
+alternative.
+
 ## You want types
 
 You're making a game engine, and you want a way to categorize entities in your
