@@ -139,10 +139,9 @@ These are unchanged from the traditional ECS pattern, but I'll introduce my
 implementation of them to simplify the explanation of new concepts later.
 
 I consider two kinds of component:
- - **Data Components** store typed data about an entity. Some examples
-   are **position**, **door**.
+ - **Data Components** store typed data about an entity.
  - **Flag Components** store no data, but their presence in an entity is
-   meaningful. Some examples are **solid**, **acid**
+   meaningful.
 
 An entity is represented by a unique identifier - namely, a 64-bit integer.
 For each type of component, there is a single data structure which stores
@@ -161,11 +160,10 @@ type EntityId = u64;
 
 struct EntityStore {
     position: HashMap<EntityId, (isize, isize)>,
-    health: HashMap<EntityId, usize>,
-    door: HashMap<EntityId, DoorState>,
+    door_state: HashMap<EntityId, DoorState>,
     tile: HashMap<EntityId, TileType>,
     solid: HashSet<EntityId>,
-    acid: HashSet<EntityId>,
+    can_open_doors: HashSet<EntityId>,
 }
 
 // supporting types
@@ -178,6 +176,15 @@ enum TileType {
     OpenDoor,
     ClosedDoor,
     ...
+}
+
+// getters
+impl EntityStore {
+    fn get_position(&self, id: EntityId) -> Option<(isize, isize)> { ... }
+    // repeated for each data component
+
+    fn contains_solid(&self, EntityId) -> bool { ... }
+    // repeated for each flag component
 }
 ```
 
@@ -206,17 +213,28 @@ Example implementation:
 ```rust
 struct RemovedComponents {
     position: HashSet<EntityId>,
-    health: HashSet<EntityId>,
     tile: HashSet<EntityId>,
-    door: HashSet<EntityId>,
+    door_state: HashSet<EntityId>,
     tile: HashSet<EntityId>,
     solid: HashSet<EntityId>,
-    acid: HashSet<EntityId>,
+    can_open_doors: HashSet<EntityId>,
 }
 
 struct Action {
     additions: EnityStore,
     removals: RemovedComponents,
+}
+
+impl Action {
+    pub fn remove_position(&mut self, id: EntityId) { ... }
+    // repeated for each component
+
+    pub fn insert_position(&mut self, id: EntityID,
+                           value: (isize, isize)) { ... }
+    // repeated for each data component
+
+    pub fn insert_solid(&mut self, id: EntityId) { ... }
+    // repeated for each flag component
 }
 ```
 
@@ -253,8 +271,7 @@ fn commit_action(entities: &mut EntityStore, action: &mut Action) {
 ```
 
 Here are some example actions. Each is expressed as an "action constructor" function which populates
-an empty action. I'm assuming for each component, the `EntityStore` and `Action` types have
-appropriate getters and setters defined.
+an empty action.
 
 ```rust
 fn move_character(character_id: EntityId, direction: Direction,
@@ -268,29 +285,18 @@ fn move_character(character_id: EntityId, direction: Direction,
     action.insert_position(character_id, new_position);
 }
 
-fn take_damage(character_id: EntityId, damage: usize,
-               state: &EntityStore, action: &mut Action) {
-
-    let current_health = state.get_health(character_id)
-        .expect("Attempt to damage character with no health");
-
-    let new_health = current_health - damage;
-
-    action.insert_health(character_id, new_health);
-}
-
 fn open_door(door_id: EntityId, action: &mut Action) {
 
     action.remove_solid(door_id);
     action.insert_tile(door_id, TileType::OpenDoor);
-    action.insert_door(door_id, DoorState::Open);
+    action.insert_door_state(door_id, DoorState::Open);
 }
 
 fn close_door(door_id: EntityId, action: &mut Action) {
 
     action.insert_solid(door_id);
     action.insert_tile(door_id, TileType::ClosedDoor);
-    action.insert_door(door_id, DoorState::Closed);
+    action.insert_door_state(door_id, DoorState::Closed);
 }
 ```
 
@@ -340,6 +346,11 @@ fn bump_open_doors(action: &Action, state: &EntityStore,
 
     // loop through all positions set by the action
     for (id, position) in action.insertions.position.iter() {
+
+        // Only proceed if this entity can actually open doors
+        if !state.contains_can_open_doors(id) {
+            continue;
+        }
 
         // I promise I'll explain this below!
         if let Some(door_id) = GET_DOOR_IN_CELL(position) {
@@ -418,10 +429,10 @@ relevant to the aggregate changes, the aggregate value must be updated.
 There are different ways to aggregate properties of cells, with different use
 cases. This post will cover two different aggregates:
  - Boolean properties that are true if there is at least one entity with a
-   certain component in a cell (e.g. **solid**). The cell will maintain a count
+   certain component in a cell. The cell will maintain a count
    of the number of entities with the component.
  - Set properties that store the ids of all the entities in a cell with a given
-   component (e.g. **door**).
+   component.
 
 ```rust
 struct SpatialHashCell {
@@ -432,9 +443,9 @@ struct SpatialHashCell {
     // keep track of the number of solid entities in this cell
     solid: usize,
 
-    // maintain a set of entities with the `door` component
+    // maintain a set of entities with the `door_state` component
     // in this cell
-    door: HashSet<EntityId>,
+    door_state: HashSet<EntityId>,
 }
 
 impl SpatialHashCell {
@@ -446,14 +457,14 @@ impl SpatialHashCell {
     }
 
     // returns the id of an arbitrarily chosen entity
-    // in this cell with the `door` component
-    fn any_door(&self) -> Option<EntityId> {
-        *self.door.iter().next()
+    // in this cell with the `door_state` component
+    fn any_door_state(&self) -> Option<EntityId> {
+        *self.door_state.iter().next()
     }
 }
 ```
 
-One may question the sense of allowing multiple entities with the **door**
+One may question the sense of allowing multiple entities with the **door_state**
 component to exist in a single cell. There are unlikely to be any realistic
 scenarios where there are multiple doors with the same position. However, the
 simplest way to implement the entity store is allow it to store any combinations
@@ -473,8 +484,14 @@ fn bump_open_doors(action: &Action, state: &EntityStore,
     // loop through all positions set by the action
     for (id, position) in action.insertions.position.iter() {
 
+        // Only proceed if this entity can actually open doors
+        if !state.contains_can_open_doors(id) {
+            continue;
+        }
+
         // NEW!
-        if let Some(door_id) = spatial_hash.get(position).any_door() {
+        if let Some(door_id) =
+            spatial_hash.get(position).any_door_state() {
 
             // if the entity would move into a cell with a door...
 
@@ -491,4 +508,178 @@ fn bump_open_doors(action: &Action, state: &EntityStore,
 }
 ```
 
+How should we handle an action that moves an entity, and gives it the ability to
+open doors at the same time? Suppose a character that could not open doors
+gained the ability to open doors, and moved into a cell containing a door, as a
+single action. I'd like the door to open.
+
+Note that the check `if !state.contains_can_open_doors(id) {`
+queries the current state of the game only, so since the character currently
+can't open doors, this check will prevent the door from being opened.
+
+I could add an additional check that examines the action, to see if the entity
+moving into a door is about to gain the ability to open doors, but this feels
+cumbersome. Instead, I want a way to talk about the state of the game after an
+action has been committed, without actually committing the action.
+
+Since the game state and actions are both described in terms of components, I
+can turn a reference to a game state and a reference to an action into something
+that looks like the state of the game following the action:
+
+```rust
+struct EntityStoreAfterAction<'a> {
+    entity_store: &'a EntityStore,
+    action: &'a Action,
+}
+
+// the same getters as an EntityStore
+impl<'a> EntityStoreAfterAction<'a> {
+
+    fn get_position(&self, id: EntityId) -> Option<(isize, isize)> {
+
+        // if the component is being inserted, return it
+        if let Some(value) = self.action.insertions.get_position(id) {
+            return Some(value);
+        }
+
+        // if the component is being removed, prevent the original
+        // value from being returned
+        if self.action.removals.position.contains(&id) {
+            return None;
+        }
+
+        // return the original value
+        return self.entity_store.get_position(id);
+    }
+
+    ...
+}
+```
+
+Now we can write the rule:
+
+```rust
+fn bump_open_doors(action: &Action, state: &EntityStore,
+                   spatial_hash: &SpatialHashTable,
+                   reactions: &mut Vec<ActionType>)
+                   -> (ActionStatus, RuleStatus) {
+
+    // NEW!
+    let future_state = EntityStoreAfterAction {
+        entity_store: state,
+        action: action,
+    };
+
+    // loop through all positions set by the action
+    for (id, position) in action.insertions.position.iter() {
+
+        // Only proceed if this entity can actually open doors
+        if !future_state.contains_can_open_doors(id) { // <-- NEW!
+            continue;
+        }
+
+        if let Some(door_id) =
+            spatial_hash.get(position).any_door_state() {
+
+            // if the entity would move into a cell with a door...
+
+            // ...open the door...
+            reactions.push(ActionType::OpenDoor(door_id));
+
+            // ...and prevent the move from occuring.
+            return (ActionStatus::Reject, RuleStatus::StopChecking);
+        }
+    }
+
+    // no doors were bumped, so check other rules
+    return (ActionStatus::Accept, RuleStatus::KeepChecking);
+}
+```
+
+The order in which rules are checked effects their outcome. For example,
+consider the following collision rule, that states that solid entities cannot
+move through other solid entities.
+
+```rust
+fn collision(action: &Action, state: &EntityStore,
+             spatial_hash: &SpatialHashTable,
+             reactions: &mut Vec<ActionType>)
+             -> (ActionStatus, RuleStatus) {
+
+    let future_state = EntityStoreAfterAction {
+        entity_store: state,
+        action: action,
+    };
+
+    for (id, position) in action.insertions.position.iter() {
+
+        if !future_state.contains_solid(id) {
+            continue;
+        }
+
+        if spatial_hash.get(position).is_solid() {
+            return (ActionStatus::Reject, RuleStatus::StopChecking);
+        }
+    }
+
+    return (ActionStatus::Accept, RuleStatus::KeepChecking);
+}
+```
+
+Since closed doors are solid, if the `collision` rule was checked before the
+`bump_open_doors` rule, the action would be rejected and we'd stop checking
+rules, so the logic that opens doors would never run. Thus, `bump_open_doors`
+should be checked before `collision`.
+
 ## Putting it all together
+
+```
+// the type of a rule function (e.g. collision)
+type RuleFn = ...;
+
+// knows which entity's turn it is
+struct TurnSchedule { ... };
+
+struct Game {
+    // all the components in the game world
+    state: EntityStore,
+
+    // this will be re-used for each action
+    action: Action,
+
+    // list of rules in the order they are checked
+    rules: Vec<RuleFn>,
+
+    // keep track of the turn order
+    schedule: TurnSchedule,
+}
+
+impl Game {
+
+    fn game_loop(&mut self) {
+        loop {
+            // Figure out whose turn it is.
+            let entity_id: EntityId =
+                self.schedule.next_turn();
+
+            // The current entity decides an action.
+            // This waits for player input if it's
+            // the player's turn, and invokes the AI
+            // if it's an NPC's turn.
+            let action_type: ActionType =
+                CHOOSE_ACTION(&self.state, entity_id);
+
+            // Populate self.action based on the
+            // value of action_type.
+            self.action.instantiate_from(action_type,
+                                         &self.state);
+
+            // Allow the entity to take another turn
+            // at some point in the future.
+            self.schedule.insert(entity_id);
+        }
+    }
+
+}
+
+```
