@@ -175,10 +175,14 @@ enum TileType {
 
 // getters
 impl EntityStore {
-    fn get_position(&self, id: EntityId) -> Option<(isize, isize)> { ... }
+    fn get_position(&self, id: EntityId) -> Option<(isize, isize)> {
+        self.position.get(&id).map(|v| *v)
+    }
     // repeated for each data component
 
-    fn contains_solid(&self, EntityId) -> bool { ... }
+    fn contains_solid(&self, id: EntityId) -> bool {
+        self.solid.contains(&id)
+    }
     // repeated for each flag component
 }
 ```
@@ -454,7 +458,7 @@ impl SpatialHashCell {
     // returns the id of an arbitrarily chosen entity
     // in this cell with the `door_state` component
     fn any_door_state(&self) -> Option<EntityId> {
-        *self.door_state.iter().next()
+        self.door_state.iter().next().map(|s| *s)
     }
 }
 ```
