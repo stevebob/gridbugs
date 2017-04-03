@@ -12,7 +12,10 @@ architecture pattern to better support a turn-based game loop.
 This involves implementing game logic in **actions** which describe
 changes to the game's state, and **rules** which prevent certain actions, and
 trigger additional reactions. The combination of actions and rules replace the
-traditional idea of "Systems".
+traditional idea of **systems**.
+
+I implemented the engine described here in the engine I used for my 7DRL: [Apocalypse
+Post](https://gridbugs.itch.io/apocalypse-post).
 
 ## Entity Component Systems
 
@@ -99,14 +102,6 @@ function game_loop(game_state) {
         if rules.permit(action) {
             /* ...then actually do the action. */
             game_state.commit(action);
-        }
-
-        /* Apply any follow-on actions, also checking that the
-         * rules permit them to occur. */
-        for each action in game_state.follow_on_actions() {
-            if rules.permit(action) {
-                game_state.commit(action);
-            }
         }
 
         /* Schedule the character's next turn. */
@@ -241,12 +236,12 @@ impl Action {
 The engine also needs a way to commit actions:
 
 ```rust
-// applies `action` to `entities`, clearing `action` in the process
-fn commit_action(entities: &mut EntityStore, action: &mut Action) {
+// applies `action` to `state`, clearing `action` in the process
+fn commit_action(state: &mut EntityStore, action: &mut Action) {
 
     // removals
     for id in action.removals.position.drain(..) {
-        entities.position.remove(id);
+        state.position.remove(id);
     }
 
     // repeated for each component type
@@ -254,7 +249,7 @@ fn commit_action(entities: &mut EntityStore, action: &mut Action) {
 
     // data insertions
     for (id, value) in action.insertions.position.drain(..) {
-        entities.position.insert(id, value);
+        state.position.insert(id, value);
     }
 
     // repeated for each data component type
@@ -262,7 +257,7 @@ fn commit_action(entities: &mut EntityStore, action: &mut Action) {
 
     // flag insertions
     for id in actions.insertions.solid.drain(..) {
-        entities.solid.insert(id);
+        state.solid.insert(id);
     }
 
     // repeated for each flag component type
@@ -468,8 +463,8 @@ One may question the sense of allowing multiple entities with the **door_state**
 component to exist in a single cell. There are unlikely to be any realistic
 scenarios where there are multiple doors with the same position. However, the
 simplest way to implement the entity store is allow it to store any combinations
-of entities, and allow higher-level policy to be implemented elsewhere (such as
-rules).
+of entities, and implement higher-level policy to be elsewhere (e.g. in actions
+or rules).
 
 ## Back to Rules
 
@@ -633,6 +628,8 @@ should be checked before `collision`.
 
 ## Putting it all together
 
+This is roughly how my game loop works:
+
 ```
 // the type of a rule function (e.g. collision)
 type RuleFn = ...;
@@ -641,17 +638,40 @@ type RuleFn = ...;
 struct TurnSchedule { ... };
 
 struct Game {
-    // all the components in the game world
+    // All entities and components in the game world.
     state: EntityStore,
 
-    // this will be re-used for each action
-    action: Action,
-
-    // list of rules in the order they are checked
+    // List of rules in the order they will be checked.
     rules: Vec<RuleFn>,
 
-    // keep track of the turn order
+    // Used to determine whose turn it is.
     schedule: TurnSchedule,
+
+    // It turns out you only need to have a single action
+    // instantiated at a time. Store this as part of the
+    // game to remove the overhead of creating a new
+    // action each time we need one.
+    action: Action,
+
+    // A queue of actions waiting to be processed in the
+    // current turn.
+    pending_actions: VecDeque<ActionType>,
+
+    // Rules have the ability to enqueue follow-on actions,
+    // which will also be processed by rules. The follow-on
+    // actions enqueued by a rule as it checks an action
+    // are only added to pending_actions if the action being
+    // checked gets accepted. Follow-on actions are
+    // temporarily stored here, and added to pending_actions
+    // if the current action is accepted.
+    //
+    // There is a separate queue for actions enqueued by
+    // accepting rules and rejecting rules. This allows
+    // accepting rules to enqueue actions that will only
+    // occur if the action ends up getting accepted.
+    follon_on_accepted: VecDequeue<ActionType>,
+    follon_on_rejected: VecDequeue<ActionType>,
+    follon_on_current: VecDequeue<ActionType>,
 }
 
 impl Game {
@@ -666,13 +686,17 @@ impl Game {
             // This waits for player input if it's
             // the player's turn, and invokes the AI
             // if it's an NPC's turn.
+            // The details of choosing an action are
+            // out of scope.
             let action_type: ActionType =
                 CHOOSE_ACTION(&self.state, entity_id);
 
-            // Populate self.action based on the
-            // value of action_type.
-            self.action.instantiate_from(action_type,
-                                         &self.state);
+            // Equeue the action for processing
+            self.pending_actions.push_back(action_type);
+
+            // Check rules, and handle any follow-on
+            // actions.
+            self.process_actions();
 
             // Allow the entity to take another turn
             // at some point in the future.
@@ -680,6 +704,107 @@ impl Game {
         }
     }
 
+    fn process_actions(&mut self) {
+
+        // Repeat until there are no pending actions.
+        while let Some(action_type) =
+            self.pending_actions.pop_front() {
+
+            // Populate self.action based on the
+            // value of action_type.
+            self.action.instantiate_from(action_type,
+                                         &self.state);
+
+            let mut accepted = true;
+
+            // For each rule
+            for rule in self.rules.iter() {
+
+                // Check the rule
+                let (action_status, rule_status) =
+                    rule(&self.action. &self.state,
+                         &mut self.follow_on_current);
+
+                // If a single rule rejects an action,
+                // the action is rejected.
+                if action_status == ActionStatus::Reject {
+                    accepted = false;
+
+                    // Drain follow-on actions into
+                    // rejected queue.
+                    for a in self.follow_on_current.drain(..) {
+                        self.follow_on_rejected.push_back(a);
+                    }
+                } else {
+                    // Drain follow-on actions into
+                    // accepted queue.
+                    for a in self.follow_on_current.drain(..) {
+                        self.follow_on_accepted.push_back(a);
+                    }
+                }
+
+                // Stop checking rules if the rule say so.
+                if rule_status == RuleStatus::StopChecking {
+                    break;
+                }
+            }
+
+            if accepted {
+
+                // Apply the action, clearing the action in the
+                // process.
+                commit_action(&mut self.state, &mut self.action);
+
+                // It's only necessary to re-draw the scene after
+                // something has changed.
+                // The details of rendering are out of scope.
+                RENDER();
+
+                // Enqueue all the follow-on actions.
+                for a in self.follow_on_accepted.drain(..) {
+                    self.pending_actions.push_back(a);
+                }
+
+            } else {
+
+                // The action was rejected.
+                // Clear the action.
+                self.action.clear();
+
+                // Enqueue all the follow-on actions.
+                for a in self.follow_on_rejected.drain(..) {
+                    self.pending_actions.push_back(a);
+                }
+            }
+        }
+    }
 }
 
 ```
+
+## Drawbacks
+
+The biggest problem I've noticed is the single list of rules does not scale
+well. I've never experienced noticable performance degredation as the number of
+rules increases,
+though, as the number of rules increases, more work must be done to check rules
+for each action.
+In terms of cognitive load, a single list of
+rules becomes difficult to manage as the list grows. Since the order of rules
+matters, every time a new rule is added, there's the ponential that it will mess
+up an existing rule. Also, debugging interference between rules is very
+difficult.
+
+To address this, I'm planning to introduce a way to classify actions into types,
+which determine a subset of rules they will be checked against. It should be
+possible to reason about a particular rule set in isolation from other rule
+sets, which will reduce the cognitive load.
+
+## Summary
+
+My turn-based game engine uses a modified form of ECS. I still store data using entities
+and components, but I found the idea of systems to be more suited to real-time
+games. In my engine, I replace systems with **actions** and **rules**. Actions
+describe discrete changes to the game's state, in terms of entities and
+components. Rules determine whether an action is allowed to happen, and which
+additional actions will happen as a result.
