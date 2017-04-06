@@ -819,7 +819,7 @@ of whether or not to keep checking the remaining rules.
 
 It's not even clear whether attempting to
 isolate rules from one another is the right approach. A lot of the fun in turn-based
-games comes from the interraction of different mechanics, so forcing the rules to
+games comes from the interaction of different mechanics, so forcing the rules to
 be isolated may be harmful, compared to a framework that allows rules to
 explicitly cooperate.
 
@@ -829,10 +829,10 @@ policy. The isolation between rules leads to several rules checking the same
 component, and unnecessarily repeating work. This is more evidencing suggesting
 I should stop isolating rules from one another.
 
-### Intra-turn Realtime Animation
+### Intra-turn Real-time Animation
 
 My engine allows a delay to be added between actions during a turn, to allow
-realtime animations to be implemented as part of a turn's resolution. In the gif
+real-time animations to be implemented as part of a turn's resolution. In the gif
 below, the bullet
 leaving the van and hitting the barrel, and the subsequent explosions, are all
 part of a single turn.
@@ -849,7 +849,7 @@ unnecessarily complicated. Also, when something goes wrong, debugging this chain
 of actions and rules is a nightmare.
 
 To simplify this, I'm thinking about adding a hook to the turn-resolution loop
-that is called at each descrete point in (real) time as a turn is resolved. It would allow some game logic to
+that is called at each discrete point in (real) time as a turn is resolved. It would allow some game logic to
 be invoked periodically to implement real-time mechanics. For example, it would take
 all the entities with a velocity, and update their position such that they move
 under their velocity. Sound familiar? I guess there's a place for **systems** in
