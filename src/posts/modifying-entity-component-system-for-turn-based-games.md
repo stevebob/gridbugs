@@ -14,7 +14,7 @@ changes to the game's state, and **rules** which prevent certain actions, and
 trigger additional reactions. The combination of actions and rules replace the
 traditional idea of **systems**.
 
-I implemented the engine described here in the engine I used for my 7DRL: [Apocalypse
+I implemented these changes in the engine I used for my 7DRL: [Apocalypse
 Post](https://gridbugs.itch.io/apocalypse-post).
 
 ## Entity Component Systems
@@ -33,7 +33,7 @@ belonging to exactly one entity. Some example components:
    player
 
 All game logic is implemented in the form of **systems**. Each system is
-interested in a particular set of components. Typically, a system are described
+interested in a particular set of components. Typically, systems are described
 as running continuously, or having periodic ticks, where they iterate over all
 the entities that possess its interested set of components, and performing some
 system-specific operation. Some example systems:
@@ -189,8 +189,8 @@ impl EntityStore {
 
 ## Mutating Data: Actions
 
-An action describes a change in the entity store. There are a small number of
-ways the entity store can be changed:
+An action describes a change to the game state. There are a small number of
+ways the game state can be changed:
  - the value of an entity's data component can be set (added or changed)
  - an entity can gain a new flag component
  - an entity can lose a component
@@ -204,7 +204,7 @@ from all component stores with the entity's id.
 
 An action is represented by an `EntityStore` (defined above), storing all
 component values being added or changed by the action. Additionally, for each
-component type, an action stores a set of entity id's that are losing that
+component type, an action has a set of entity id's that are losing that
 component.
 
 Example implementation:
@@ -302,28 +302,43 @@ fn close_door(door_id: EntityId, action: &mut Action) {
 Note how none of the functions above modify the game's state directly, but
 rather construct an `Action` which describes how the state will be modified.
 
-It is convenient to refer to an action by a name and some parameters, which can
-be turned into a call to the appropriate action-constructing function at a later
-time. Rust makes this easy with enums:
+It will be convenient to be able to talk about the type of an action without
+instantiating it:
 ```rust
 enum ActionType {
     MoveCharacter(EntityId, Direction),
-    TakeDamage(EntityId, usize),
     OpenDoor(EntityId),
     CloseDoor(EntityId),
 }
 ```
 
 Given an `ActionType`, a `&EntityStore`, and a `&mut Action`, it's possible to
-call the appropriate action constructor with all its arguments.
+call the appropriate action constructor with all its arguments:
+```rust
+fn create_action(action_type: ActionType, state: &EntityStore, action: &mut Action) {
+    // `action` is assumed to be initially empty
+
+    match action_type {
+        MoveCharacter(entity_id, direction) => {
+            move_character(entity_id, direction, state, action);
+        }
+        OpenDoor(entity_id) => {
+            open_door(entity_id, state, action);
+        }
+        CloseDoor(entity_id) => {
+            close_door(entity_id, state, action);
+        }
+    }
+}
+```
 
 ## Game Logic: Rules
 
 A game can have many rules. Each rules contains some logic that examines the
 current state of the game, and an action, and decides:
  - whether the action is allowed to occur
- - whether additional rules should be checked
  - which additional actions should occur
+ - whether additional rules should be checked
 
 Here's an example that encodes the mechanic where bumping into a
 closed door will open the door.
@@ -388,7 +403,7 @@ Now, what's going on with that `GET_DOOR_IN_CELL` function. So far I haven't
 talked at all about reasoning about individual cells - only individual entities
 or components. The `EntityStore` described earlier has no notion of cells, and
 could be used for non grid-based games. All my applications of this engine so
-far have been for games on a 2d grid, and most rules want to talk about
+far *have* been for games on a 2d grid, and most rules want to talk about
 properties of cells, as well as properties of entities. To enable this, I use a
 spatial hash, which I'll introduce now, and elaborate more on rules later.
 
@@ -420,17 +435,17 @@ impl SpatialHashTable {
 ```
 
 The cells are more interesting. Each cell maintains a set containing the ids of
-all entities in the position tracked by that cell. When an entity moves, the
+all entities in the cell. When an entity moves, the
 entity id set of the source cell and destination cell must be updated.
 Additionally, for aggregate values, each time an entity moves or the component
 relevant to the aggregate changes, the aggregate value must be updated.
 
 There are different ways to aggregate properties of cells, with different use
 cases. This post will cover two different aggregates:
- - Boolean properties that are true if there is at least one entity with a
+ - Booleans that are true if there is at least one entity with a
    certain component in a cell. The cell will maintain a count
    of the number of entities with the component.
- - Set properties that store the ids of all the entities in a cell with a given
+ - Sets that store the ids of all the entities in a cell with a given
    component.
 
 ```rust
@@ -510,10 +525,10 @@ fn bump_open_doors(action: &Action, state: &EntityStore,
 How should we handle an action that moves an entity, and gives it the ability to
 open doors at the same time? Suppose a character that could not open doors
 gained the ability to open doors, and moved into a cell containing a door, as a
-single action. I'd like the door to open.
+single action. I'd like the door to open in response.
 
 Note that the check `if !state.contains_can_open_doors(id) {`
-queries the current state of the game only, so since the character currently
+queries the current state of the game only. Since the character currently
 can't open doors, this check will prevent the door from being opened.
 
 I could add an additional check that examines the action, to see if the entity
@@ -555,8 +570,10 @@ impl<'a> EntityStoreAfterAction<'a> {
 }
 ```
 
-Now we can write the rule:
+An `EntityStoreAfterAction` looks like an `EntityStore`! They both implement the
+same query interface, but `EntityStoreAfterAction` lets us query the future.
 
+Modifying the rule to use `EntityStoreAfterAction`:
 ```rust
 fn bump_open_doors(action: &Action, state: &EntityStore,
                    spatial_hash: &SpatialHashTable,
@@ -573,7 +590,7 @@ fn bump_open_doors(action: &Action, state: &EntityStore,
     for (id, position) in action.insertions.position.iter() {
 
         // Only proceed if this entity can actually open doors
-        if !future_state.contains_can_open_doors(id) { // <-- NEW!
+        if !future_state.contains_can_open_doors(id) { // <-- CHANGED!
             continue;
         }
 
@@ -786,29 +803,63 @@ impl Game {
 
 ```
 
-## Drawbacks
+## Limitations
 
-The biggest problem I've noticed is the single list of rules does not scale
-well. I've never experienced noticable performance degredation as the number of
-rules increases,
-though, as the number of rules increases, more work must be done to check rules
-for each action.
-In terms of cognitive load, a single list of
-rules becomes difficult to manage as the list grows. Since the order of rules
-matters, every time a new rule is added, there's the ponential that it will mess
-up an existing rule. Also, debugging interference between rules is very
-difficult.
+While using this engine for the 7DRL, I noticed some problems with its current
+design.
 
-To address this, I'm planning to introduce a way to classify actions into types,
-which determine a subset of rules they will be checked against. It should be
-possible to reason about a particular rule set in isolation from other rule
-sets, which will reduce the cognitive load.
+### Isolated Rules
+
+Splitting up the game logic into many individual rules leads to high cognitive load.
+The motivation for having lots of small, modular, isolated rules, was to
+*decrease* cognitive load, but it ended up having the opposite effect. The problem
+is that rules aren't completely isolated. If rules are checked in the wrong order
+they can be unintentionally skipped. Rules have the ability to make the global decision
+of whether or not to keep checking the remaining rules.
+
+It's not even clear whether attempting to
+isolate rules from one another is the right approach. A lot of the fun in turn-based
+games comes from the interraction of different mechanics, so forcing the rules to
+be isolated may be harmful, compared to a framework that allows rules to
+explicitly cooperate.
+
+Most of the rules reason about changes in position. This means, each rule must
+loop over all the changes in position in the current action, and apply some
+policy. The isolation between rules leads to several rules checking the same
+component, and unnecessarily repeating work. This is more evidencing suggesting
+I should stop isolating rules from one another.
+
+### Intra-turn Realtime Animation
+
+My engine allows a delay to be added between actions during a turn, to allow
+realtime animations to be implemented as part of a turn's resolution. In the gif
+below, the bullet
+leaving the van and hitting the barrel, and the subsequent explosions, are all
+part of a single turn.
+
+![explosion](images/explosion.gif)
+
+This is implemented using rules. Entities can have a **velocity** component, and
+there is a rule that detects when an entity moves because of their velocity, and
+schedules an additional action to move them again, resulting in a chain of
+repeated move actions being committed.
+
+This is a testament to the expressive power of actions and rules, but it feels
+unnecessarily complicated. Also, when something goes wrong, debugging this chain
+of actions and rules is a nightmare.
+
+To simplify this, I'm thinking about adding a hook to the turn-resolution loop
+that is called at each descrete point in (real) time as a turn is resolved. It would allow some game logic to
+be invoked periodically to implement real-time mechanics. For example, it would take
+all the entities with a velocity, and update their position such that they move
+under their velocity. Sound familiar? I guess there's a place for **systems** in
+my engine after all.
 
 ## Summary
 
 My turn-based game engine uses a modified form of ECS. I still store data using entities
 and components, but I found the idea of systems to be more suited to real-time
-games. In my engine, I replace systems with **actions** and **rules**. Actions
+games. In my engine, I replace **systems** with **actions** and **rules**. Actions
 describe discrete changes to the game's state, in terms of entities and
 components. Rules determine whether an action is allowed to happen, and which
 additional actions will happen as a result.
