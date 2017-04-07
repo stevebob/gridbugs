@@ -1,7 +1,7 @@
 ---
 layout: post.hbt
 title: "Modifying Entity Component System for Turn-Based Games"
-date:   2017-04-01 19:28:01+1000
+date:   2017-04-07 23:40:01+1000
 categories: gamedev roguelikes
 permalink: modifying-entity-component-system-for-turn-based-games
 ---
