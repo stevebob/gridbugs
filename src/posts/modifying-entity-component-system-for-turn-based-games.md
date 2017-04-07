@@ -72,7 +72,7 @@ loop is more suited for real-time games than turn-based games.
 
 In a real-time
 game, you must constantly re-render the scene so the player can see changes to
-the game's state. At any point, the player may press button, and the game state
+the game's state. At any point, the player may press a button, and the game state
 must update immediately. Physics is constantly being enforced, non-player
 characters are
 constantly determining what to do next, animations are always being played.
@@ -411,7 +411,7 @@ spatial hash, which I'll introduce now, and elaborate more on rules later.
 
 In games where the world is represented as a grid, it's useful to be able to
 reason about entire cells in the grid. At the very least, it would be nice to
-easily iterate through a list of entities in a particular cell. I also want to,
+easily iterate through a list of entities in a particular cell. I also want to
 have properties of cells based on aggregating over components of the entities
 in the cell. For example, if a cell contains at least one entity which has the
 **solid** component, I want that cell to be considered solid.
@@ -826,7 +826,7 @@ explicitly cooperate.
 Most of the rules reason about changes in position. This means, each rule must
 loop over all the changes in position in the current action, and apply some
 policy. The isolation between rules leads to several rules checking the same
-component, and unnecessarily repeating work. This is more evidencing suggesting
+component, and unnecessarily repeating work. This is more evidence suggesting
 I should stop isolating rules from one another.
 
 ### Intra-turn Real-time Animation
